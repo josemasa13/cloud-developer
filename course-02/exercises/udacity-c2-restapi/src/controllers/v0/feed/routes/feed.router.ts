@@ -18,13 +18,68 @@ router.get('/', async (req: Request, res: Response) => {
 
 //@TODO
 //Add an endpoint to GET a specific resource by Primary Key
+router.get('/:id', async (req: Request, res: Response) => {
+    const { id } = req.params
+
+    if ( !id ){
+        res.status(404).send("You need to provide an ID");
+    } 
+    const element = await FeedItem.findByPk(id);
+
+    if ( element === null){
+        res.status(404).send("The element provided was not found");
+    }
+
+    res.status(200).send(element);
+});
+
+
 
 // update a specific resource
 router.patch('/:id', 
     requireAuth, 
     async (req: Request, res: Response) => {
         //@TODO try it yourself
-        res.send(500).send("not implemented")
+        const { id } = req.params;
+        const { caption, url } = req.body;
+
+        if ( !id ){
+            res.status(400).send("You must provide an ID in order to update a record");
+        }
+
+        const element = await FeedItem.findByPk(id);
+        
+
+        if (element === null){
+            res.status(404).send("There is no element with the provided id in the database")
+        }
+
+        if ( !caption && !url){
+            res.status(400).send("Please provide the new information in request's body");
+        }
+
+        if ( !caption && url){
+            await FeedItem.update({url : url }, {
+                where: {
+                  id: id
+                }
+            });
+           
+        } else if ( !url && caption){
+            await FeedItem.update({caption : caption }, {
+                where: {
+                  id: id
+                }
+            });
+        } else{
+            await FeedItem.update({url: url, caption : caption }, {
+                where: {
+                  id: id
+                }
+            });
+        }
+
+        res.status(200).send("The information has been updated");
 });
 
 

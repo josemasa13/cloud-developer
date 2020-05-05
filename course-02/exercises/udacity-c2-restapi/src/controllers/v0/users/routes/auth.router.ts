@@ -1,35 +1,33 @@
 import { Router, Request, Response } from 'express';
-
 import { User } from '../models/User';
-
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { NextFunction } from 'connect';
-
-import * as EmailValidator from 'email-validator';
 import { config } from  '../../../../config/config';
+import * as EmailValidator from 'email-validator';
 
 const router: Router = Router();
 
 async function generatePassword(plainTextPassword: string): Promise<string> {
     //@TODO Use Bcrypt to Generated Salted Hashed Passwords
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSaltSync(10);
     const hash = await bcrypt.hash(plainTextPassword, salt);
     return hash;
 }
 
 async function comparePasswords(plainTextPassword: string, hash: string): Promise<boolean> {
     //@TODO Use Bcrypt to Compare your password to your Salted Hashed Password
-    return await bcrypt.compareSync(plainTextPassword, hash){
-
+    return await bcrypt.compareSync(plainTextPassword, hash);
 }
 
 function generateJWT(user: User): string {
     //@TODO Use jwt to create a new JWT Payload containing
-    return jwt.sign(user, config.jwt.secret);
+    return jwt.sign(user.toJSON(), config.jwt.secret);
+
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
+    
     // no headers or no authorization headers
      if (!req.headers || !req.headers.authorization){
          return res.status(401).send({ message: 'No authorization headers.' });

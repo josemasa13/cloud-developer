@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import { runInNewContext } from 'vm';
 
 (async () => {
 
@@ -30,6 +31,34 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   /**************************************************************************** */
 
   //! END @TODO1
+
+  app.get("/filteredimage/", async ( req, res ) => {
+    let { image_url } = req.query;
+    console.log(image_url);
+
+    if (!image_url){
+      res.status(400).send("Please provide the image to filter in your request");
+    }
+
+    let imagePath : string = await filterImageFromURL(image_url);
+
+    if ( imagePath ){
+      res.status(200).sendFile(imagePath, function (err){
+        if (err) {
+          console.log("An error occurred while filtering image");
+        } else{
+          deleteLocalFiles([imagePath]);
+        }
+      });
+
+      
+      
+    } else{
+      res.status(500).send("There was an error when on the image filtering process");
+    }
+
+
+  });
   
   // Root Endpoint
   // Displays a simple message to the user

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 import { runInNewContext } from 'vm';
@@ -32,9 +32,8 @@ import { runInNewContext } from 'vm';
 
   //! END @TODO1
 
-  app.get("/filteredimage/", async ( req, res ) => {
+  app.get("/filteredimage/", async ( req: Request, res: Response ) => {
     let { image_url } = req.query;
-    console.log(image_url);
 
     if (!image_url){
       res.status(400).send("Please provide the image to filter in your request");
@@ -62,7 +61,7 @@ import { runInNewContext } from 'vm';
   
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
+  app.get( "/", async ( req: Request, res: Response ) => {
     res.send("try GET /filteredimage?image_url={{}}")
   } );
   

@@ -34,7 +34,6 @@ import { runInNewContext } from 'vm';
 
   app.get("/filteredimage/", async ( req: Request, res: Response ) => {
     let { image_url } = req.query;
-    console.log(image_url);
 
     if (!image_url){
       res.status(400).send("Please provide the image to filter in your request");
